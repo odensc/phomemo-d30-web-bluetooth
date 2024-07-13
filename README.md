@@ -4,7 +4,7 @@ Proof of concept and demo of printing to a [Phomemo D30](https://www.amazon.com/
 
 ## Demo
 
-[A demo is available here.](https://odensc.github.io/phomemo-d30-web-bluetooth) Please use a Web Bluetooth-compatible browser (e.g. Chrome or Edge).
+[A demo is available here.](https://odensc.github.io/phomemo-d30-web-bluetooth) Please use a Web Bluetooth-compatible browser (e.g. Chromium-based).
 
 ## Credits
 
