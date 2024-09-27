@@ -83,17 +83,17 @@ const getPrintData = (canvas) => {
 const printCanvas = async (characteristic, canvas) => {
 	const data = getPrintData(canvas);
 
-	await characteristic.writeValueWithoutResponse(
+	await characteristic.writeValueWithResponse(
 		HEADER_DATA(canvas.width / 8, data.length / (canvas.width / 8))
 	);
 
 	for (let i = 0; ; i += PACKET_SIZE_BYTES) {
 		if (i < data.length) {
-			await characteristic.writeValueWithoutResponse(
+			await characteristic.writeValueWithResponse(
 				data.slice(i, i + PACKET_SIZE_BYTES)
 			);
 		} else {
-			await characteristic.writeValueWithoutResponse(
+			await characteristic.writeValueWithResponse(
 				data.slice(i * PACKET_SIZE_BYTES, data.length)
 			);
 			break;
@@ -103,5 +103,5 @@ const printCanvas = async (characteristic, canvas) => {
 	}
 
 	console.log(`Sent ${data.length}/${data.length} bytes (done)`);
-	await characteristic.writeValueWithoutResponse(END_DATA);
+	await characteristic.writeValueWithResponse(END_DATA);
 };
