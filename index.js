@@ -1,5 +1,8 @@
 "use strict";
 
+import { drawText } from "https://cdn.jsdelivr.net/npm/canvas-txt@4.1.1/+esm";
+import { printCanvas } from "./src/printer.js";
+
 const $ = document.querySelector.bind(document);
 const $all = document.querySelectorAll.bind(document);
 
@@ -9,7 +12,7 @@ const updateLabelSize = (canvas) => {
 	const inputWidth = $("#inputWidth").valueAsNumber;
 	const inputHeight = $("#inputHeight").valueAsNumber;
 	if (isNaN(inputWidth) || isNaN(inputHeight)) {
-		console.log("label size invalid");
+		handleError("label size invalid");
 		return;
 	}
 
@@ -21,7 +24,14 @@ const updateLabelSize = (canvas) => {
 	canvas.height = labelSize.width * 8;
 };
 
-const updateCanvasText = (canvas, text) => {
+const updateCanvasText = (canvas) => {
+	const text = $("#inputText").value;
+	const fontSize = $("#inputFontSize").valueAsNumber;
+	if (isNaN(fontSize)) {
+		handleError("font size invalid");
+		return;
+	}
+
 	const ctx = canvas.getContext("2d");
 	ctx.fillStyle = "#fff";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -30,15 +40,23 @@ const updateCanvasText = (canvas, text) => {
 	ctx.rotate(Math.PI / 2);
 
 	ctx.fillStyle = "#000";
-	ctx.font = "48px sans-serif";
 	ctx.textAlign = "center";
-	ctx.fillText(text, 0, 15);
+	ctx.textBaseline = "top";
+	drawText(ctx, text, {
+		x: -canvas.height / 2,
+		y: -canvas.width / 2,
+		width: canvas.height,
+		height: canvas.width,
+		font: "sans-serif",
+		fontSize,
+	});
 
 	ctx.rotate(-Math.PI / 2);
 	ctx.translate(-canvas.width / 2, -canvas.height / 2);
 };
 
-const updateCanvasBarcode = (canvas, barcodeData) => {
+const updateCanvasBarcode = (canvas) => {
+	const barcodeData = $("#inputBarcode").value;
 	const image = document.createElement("img");
 	image.addEventListener("load", () => {
 		const ctx = canvas.getContext("2d");
@@ -75,10 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	const canvas = document.querySelector("#canvas");
 
 	document.addEventListener("shown.bs.tab", (e) => {
-		if (e.target.id === "nav-text-tab")
-			updateCanvasText(canvas, $("#inputText").value);
-		else if (e.target.id === "nav-barcode-tab")
-			updateCanvasBarcode(canvas, $("#inputBarcode").value);
+		if (e.target.id === "nav-text-tab") updateCanvasText(canvas);
+		else if (e.target.id === "nav-barcode-tab") updateCanvasBarcode(canvas);
 	});
 
 	$all("#inputWidth, #inputHeight").forEach((e) =>
@@ -86,30 +102,23 @@ document.addEventListener("DOMContentLoaded", function () {
 	);
 	updateLabelSize(canvas);
 
-	$("#inputText").addEventListener("input", (e) =>
-		updateCanvasText(canvas, e.target.value)
+	$all("#inputText, #inputFontSize").forEach((e) =>
+		e.addEventListener("input", () => updateCanvasText(canvas))
 	);
-	updateCanvasText(canvas, $("#inputText").value);
+	updateCanvasText(canvas);
 
-	$("#inputBarcode").addEventListener("input", (e) =>
-		updateCanvasBarcode(canvas, e.target.value)
-	);
+	$("#inputBarcode").addEventListener("input", () => updateCanvasBarcode(canvas));
 
 	$("form").addEventListener("submit", (e) => {
 		e.preventDefault();
-
 		navigator.bluetooth
 			.requestDevice({
 				acceptAllDevices: true,
 				optionalServices: ["0000ff00-0000-1000-8000-00805f9b34fb"],
 			})
 			.then((device) => device.gatt.connect())
-			.then((server) =>
-				server.getPrimaryService("0000ff00-0000-1000-8000-00805f9b34fb")
-			)
-			.then((service) =>
-				service.getCharacteristic("0000ff02-0000-1000-8000-00805f9b34fb")
-			)
+			.then((server) => server.getPrimaryService("0000ff00-0000-1000-8000-00805f9b34fb"))
+			.then((service) => service.getCharacteristic("0000ff02-0000-1000-8000-00805f9b34fb"))
 			.then((char) => printCanvas(char, canvas))
 			.catch(handleError);
 	});

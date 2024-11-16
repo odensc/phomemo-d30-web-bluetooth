@@ -80,7 +80,7 @@ const getPrintData = (canvas) => {
  * @param {BluetoothRemoteGATTCharacteristic} characteristic
  * @param {HTMLCanvasElement} canvas
  */
-const printCanvas = async (characteristic, canvas) => {
+export const printCanvas = async (characteristic, canvas) => {
 	const data = getPrintData(canvas);
 
 	await characteristic.writeValueWithResponse(
@@ -89,13 +89,9 @@ const printCanvas = async (characteristic, canvas) => {
 
 	for (let i = 0; ; i += PACKET_SIZE_BYTES) {
 		if (i < data.length) {
-			await characteristic.writeValueWithResponse(
-				data.slice(i, i + PACKET_SIZE_BYTES)
-			);
+			await characteristic.writeValueWithResponse(data.slice(i, i + PACKET_SIZE_BYTES));
 		} else {
-			await characteristic.writeValueWithResponse(
-				data.slice(i * PACKET_SIZE_BYTES, data.length)
-			);
+			await characteristic.writeValueWithResponse(data.slice(i * PACKET_SIZE_BYTES, data.length));
 			break;
 		}
 

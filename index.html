@@ -56,13 +56,22 @@
 						tabindex="0"
 					>
 						<h2>Text</h2>
+						<label for="inputFontSize" class="form-label">Font size</label>
+						<div class="input-group mb-2">
+							<input
+								type="number"
+								step="1"
+								min="1"
+								value="48"
+								size="10"
+								class="form-control flex-grow-0"
+								style="width: 4rem"
+								id="inputFontSize"
+							/>
+							<span class="input-group-text">px</span>
+						</div>
 						<label for="inputText" class="form-label">Text to print</label>
-						<input
-							type="text"
-							class="form-control"
-							value="Hello world"
-							id="inputText"
-						/>
+						<textarea class="form-control" id="inputText">Hello world</textarea>
 					</div>
 					<div
 						class="tab-pane"
@@ -72,15 +81,8 @@
 						tabindex="0"
 					>
 						<h2>Barcode</h2>
-						<label for="inputBarcode" class="form-label"
-							>Barcode data (CODE128)</label
-						>
-						<input
-							type="text"
-							class="form-control"
-							value="123456"
-							id="inputBarcode"
-						/>
+						<label for="inputBarcode" class="form-label">Barcode data (CODE128)</label>
+						<input type="text" class="form-control" value="123456" id="inputBarcode" />
 					</div>
 				</div>
 
@@ -119,9 +121,7 @@
 					</div>
 				</div>
 
-				<button type="submit" class="btn btn-primary">
-					Connect &amp; print
-				</button>
+				<button type="submit" class="btn btn-primary">Connect &amp; print</button>
 			</form>
 		</div>
 
@@ -161,7 +161,6 @@
 			referrerpolicy="no-referrer"
 			defer
 		></script>
-		<script src="src/printer.js" defer></script>
-		<script src="index.js" defer></script>
+		<script type="module" src="index.js" defer></script>
 	</body>
 </html>
