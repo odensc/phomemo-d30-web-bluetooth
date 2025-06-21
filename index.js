@@ -81,6 +81,59 @@ const updateCanvasBarcode = (canvas) => {
 	});
 };
 
+const drawImageToCanvas = (ctx, url, doScale = true) => {
+	const img = new Image();
+	img.addEventListener("load", () => {
+		ctx.fillStyle = "#fff";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+		ctx.translate(canvas.width / 2, canvas.height / 2);
+		ctx.rotate(Math.PI / 2);
+
+		ctx.imageSmoothingEnabled = false;
+		// draw image in center of canvas, scaled to fit
+		const scale = doScale ? Math.min(canvas.height / img.width, canvas.width / img.height) : 1;
+		const drawWidth = img.width * scale;
+		const drawHeight = img.height * scale;
+		ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+		ctx.rotate(-Math.PI / 2);
+		ctx.translate(-canvas.width / 2, -canvas.height / 2);
+	});
+	img.addEventListener("error", () => {
+		handleError("failed to load image");
+	});
+
+	img.src = url;
+};
+
+const updateCanvasImage = (canvas) => {
+	const ctx = canvas.getContext("2d");
+	const file = $("#inputImage").files[0];
+	if (!file) {
+		ctx.fillStyle = "#fff";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		return;
+	}
+
+	const reader = new FileReader();
+	reader.addEventListener("load", (e) => {
+		drawImageToCanvas(ctx, e.target.result);
+	});
+	reader.addEventListener("error", () => {
+		handleError("failed to read image file");
+	});
+
+	reader.readAsDataURL(file);
+};
+
+const updateCanvasQR = async (canvas) => {
+	const data = $("#inputQR").value;
+	const ctx = canvas.getContext("2d");
+	const qrImg = await QRCode.toDataURL(data, { width: canvas.width - 8, margin: 2 });
+	drawImageToCanvas(ctx, qrImg, false);
+};
+
 const handleError = (err) => {
 	console.error(err);
 
@@ -95,6 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.addEventListener("shown.bs.tab", (e) => {
 		if (e.target.id === "nav-text-tab") updateCanvasText(canvas);
 		else if (e.target.id === "nav-barcode-tab") updateCanvasBarcode(canvas);
+		else if (e.target.id === "nav-image-tab") updateCanvasImage(canvas);
+		else if (e.target.id === "nav-qr-tab") updateCanvasQR(canvas);
 	});
 
 	$all("#inputWidth, #inputHeight").forEach((e) =>
@@ -108,6 +163,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	updateCanvasText(canvas);
 
 	$("#inputBarcode").addEventListener("input", () => updateCanvasBarcode(canvas));
+	$("#inputImage").addEventListener("change", () => updateCanvasImage(canvas));
+	$("#inputQR").addEventListener("input", () => updateCanvasQR(canvas));
 
 	$("form").addEventListener("submit", (e) => {
 		e.preventDefault();

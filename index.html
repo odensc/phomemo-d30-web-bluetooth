@@ -44,6 +44,30 @@
 					>
 						Barcode
 					</button>
+					<button
+						class="nav-link"
+						id="nav-image-tab"
+						data-bs-toggle="tab"
+						data-bs-target="#nav-image"
+						type="button"
+						role="tab"
+						aria-controls="nav-image"
+						aria-selected="false"
+					>
+						Image
+					</button>
+					<button
+						class="nav-link"
+						id="nav-qr-tab"
+						data-bs-toggle="tab"
+						data-bs-target="#nav-qr"
+						type="button"
+						role="tab"
+						aria-controls="nav-qr"
+						aria-selected="false"
+					>
+						QR Code
+					</button>
 				</div>
 			</nav>
 			<form class="col-lg-6">
@@ -83,6 +107,28 @@
 						<h2>Barcode</h2>
 						<label for="inputBarcode" class="form-label">Barcode data (CODE128)</label>
 						<input type="text" class="form-control" value="123456" id="inputBarcode" />
+					</div>
+					<div
+						class="tab-pane"
+						id="nav-image"
+						role="tabpanel"
+						aria-labelledby="nav-image-tab"
+						tabindex="0"
+					>
+						<h2>Image</h2>
+						<label for="inputImage" class="form-label">Image file</label>
+						<input type="file" class="form-control" id="inputImage" />
+					</div>
+					<div
+						class="tab-pane"
+						id="nav-qr"
+						role="tabpanel"
+						aria-labelledby="nav-qr-tab"
+						tabindex="0"
+					>
+						<h2>QR Code</h2>
+						<label for="inputQR" class="form-label">QR code data</label>
+						<input type="text" class="form-control" value="https://example.com" id="inputQR" />
 					</div>
 				</div>
 
@@ -161,6 +207,7 @@
 			referrerpolicy="no-referrer"
 			defer
 		></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js" integrity="sha512-PEhlWBZBrQL7flpJPY8lXx8tIN7HWX912GzGhFTDqA3iWFrakVH3lVHomCoU9BhfKzgxfEk6EG2C3xej+9srOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 		<script type="module" src="index.js" defer></script>
 	</body>
 </html>
