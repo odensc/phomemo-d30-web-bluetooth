@@ -68,6 +68,18 @@
 					>
 						QR Code
 					</button>
+					<button
+						class="nav-link"
+						id="nav-qr-text-tab"
+						data-bs-toggle="tab"
+						data-bs-target="#nav-qr-text"
+						type="button"
+						role="tab"
+						aria-controls="nav-qr-text"
+						aria-selected="false"
+					>
+						QR Code + Text
+					</button>
 				</div>
 			</nav>
 			<form class="col-lg-6">
@@ -129,6 +141,35 @@
 						<h2>QR Code</h2>
 						<label for="inputQR" class="form-label">QR code data</label>
 						<input type="text" class="form-control" value="https://example.com" id="inputQR" />
+					</div>
+					<div
+						class="tab-pane"
+						id="nav-qr-text"
+						role="tabpanel"
+						aria-labelledby="nav-qr-text-tab"
+						tabindex="0"
+					>
+						<h2>QR Code</h2>
+						<label for="inputQR" class="form-label">QR code data</label>
+						<input type="text" class="form-control" value="https://example.com" id="inputQRTextData" />
+
+						<h2>Text</h2>
+						<label for="inputFontSize" class="form-label">Font size</label>
+						<div class="input-group mb-2">
+							<input
+								type="number"
+								step="1"
+								min="1"
+								value="28"
+								size="10"
+								class="form-control flex-grow-0"
+								style="width: 4rem"
+								id="inputQRTextSize"
+							/>
+							<span class="input-group-text">px</span>
+						</div>
+						<label for="inputQRText" class="form-label">Text to print</label>
+						<textarea class="form-control" id="inputQRText">example.com</textarea>
 					</div>
 				</div>
 

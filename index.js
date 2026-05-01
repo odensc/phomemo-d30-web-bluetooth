@@ -134,6 +134,78 @@ const updateCanvasQR = async (canvas) => {
 	drawImageToCanvas(ctx, qrImg, false);
 };
 
+const updateCanvasQRText = async (canvas) => {
+	const data = $("#inputQRTextData").value;
+	const text = $("#inputQRText").value;
+	const fontSizeInput = $("#inputQRTextSize").valueAsNumber;
+	const ctx = canvas.getContext("2d");
+	const labelWidth = canvas.height;
+	const labelHeight = canvas.width;
+	const padding = 4;
+	const gap = 6;
+	const left = -labelWidth / 2 + padding;
+	const top = -labelHeight / 2 + padding;
+	const right = labelWidth / 2 - padding;
+	const bottom = labelHeight / 2 - padding;
+	const fallbackFontSize = Math.floor(labelHeight * 0.4);
+	const fontSize = isNaN(fontSizeInput)
+		? Math.max(10, Math.min(48, fallbackFontSize))
+		: Math.max(1, fontSizeInput);
+
+	ctx.fillStyle = "#fff";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	const maxQrSize = Math.max(16, Math.min(labelHeight - padding * 2, labelWidth - padding * 2));
+	let qrSize = maxQrSize;
+	if (text.trim()) {
+		const minTextWidth = 32;
+		const availableForQr = right - left - gap - minTextWidth;
+		qrSize = Math.max(16, Math.min(maxQrSize, availableForQr));
+	}
+	const qrImg = await QRCode.toDataURL(data, { width: qrSize, margin: 1 });
+	const image = new Image();
+	image.addEventListener("load", () => {
+		ctx.translate(canvas.width / 2, canvas.height / 2);
+		ctx.rotate(Math.PI / 2);
+
+		ctx.imageSmoothingEnabled = false;
+		if (!text.trim()) {
+			const drawX = -labelWidth / 2 + (labelWidth - qrSize) / 2;
+			const drawY = -labelHeight / 2 + (labelHeight - qrSize) / 2;
+			ctx.drawImage(image, drawX, drawY, qrSize, qrSize);
+		} else {
+			const qrX = left;
+			const qrY = top;
+			ctx.drawImage(image, qrX, qrY, qrSize, qrSize);
+
+			ctx.fillStyle = "#000";
+			ctx.textAlign = "left";
+			ctx.textBaseline = "top";
+			const textX = qrX + qrSize + gap;
+			const textY = top;
+			const textWidth = Math.max(0, right - textX);
+			const textHeight = Math.max(0, bottom - top);
+			if (textWidth > 0 && textHeight > 0) {
+				drawText(ctx, text, {
+					x: textX,
+					y: textY,
+					width: textWidth,
+					height: textHeight,
+					font: "sans-serif",
+					fontSize,
+				});
+			}
+		}
+
+		ctx.rotate(-Math.PI / 2);
+		ctx.translate(-canvas.width / 2, -canvas.height / 2);
+	});
+	image.addEventListener("error", () => {
+		handleError("failed to load QR code");
+	});
+	image.src = qrImg;
+};
+
 const handleError = (err) => {
 	console.error(err);
 
@@ -150,6 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		else if (e.target.id === "nav-barcode-tab") updateCanvasBarcode(canvas);
 		else if (e.target.id === "nav-image-tab") updateCanvasImage(canvas);
 		else if (e.target.id === "nav-qr-tab") updateCanvasQR(canvas);
+		else if (e.target.id === "nav-qr-text-tab") updateCanvasQRText(canvas);
 	});
 
 	$all("#inputWidth, #inputHeight").forEach((e) =>
@@ -165,6 +238,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	$("#inputBarcode").addEventListener("input", () => updateCanvasBarcode(canvas));
 	$("#inputImage").addEventListener("change", () => updateCanvasImage(canvas));
 	$("#inputQR").addEventListener("input", () => updateCanvasQR(canvas));
+	$all("#inputQRTextData, #inputQRText, #inputQRTextSize").forEach((e) =>
+		e.addEventListener("input", () => updateCanvasQRText(canvas))
+	);
 
 	$("form").addEventListener("submit", (e) => {
 		e.preventDefault();
